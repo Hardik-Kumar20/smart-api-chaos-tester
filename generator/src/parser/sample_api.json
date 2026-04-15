@@ -1,0 +1,22 @@
+{
+    "paths": {
+      "/users": {
+        "post": {
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["email", "age"],
+                  "properties": {
+                    "email": { "type": "string" },
+                    "age": { "type": "integer" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }

@@ -1,0 +1,141 @@
+[
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {
+      "email": "test",
+      "age": 1
+    },
+    "tags": [
+      "valid"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {
+      "email": 123
+    },
+    "tags": [
+      "invalid",
+      "type"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {
+      "age": "wrong"
+    },
+    "tags": [
+      "invalid",
+      "type"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {
+      "email": " ' OR 1==1 -- "
+    },
+    "tags": [
+      "attack",
+      "sqli"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {
+      "email": "'; DROP TABLE users; --"
+    },
+    "tags": [
+      "attack",
+      "sqli"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {
+      "email": "<script>alert(1)</script>"
+    },
+    "tags": [
+      "attack",
+      "xss"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {},
+    "tags": [
+      "invalid",
+      "missing_field"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {},
+    "tags": [
+      "invalid",
+      "missing_field"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {
+      "email": ""
+    },
+    "tags": [
+      "boundary",
+      "email"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {
+      "email": null
+    },
+    "tags": [
+      "boundary",
+      "email"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {
+      "age": -1
+    },
+    "tags": [
+      "boundary",
+      "age"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {
+      "age": 0
+    },
+    "tags": [
+      "boundary",
+      "age"
+    ]
+  },
+  {
+    "method": "POST",
+    "url": "/users",
+    "payload": {
+      "age": 999999999
+    },
+    "tags": [
+      "boundary",
+      "age"
+    ]
+  }
+]
