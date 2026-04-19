@@ -1,5 +1,5 @@
 class MetricsCollector {
-    constructor () {
+    constructor() {
         this.results = [];
     }
 
@@ -7,7 +7,7 @@ class MetricsCollector {
         this.results.push(result);
     }
 
-    gotResults() {
+    getResults() {   // ✅ correct name
         return this.results;
     }
 }
