@@ -34,4 +34,24 @@ function analyze( results ) {
     }
 }
 
-module.exports = { analyze };
+
+function analyzeSmart(results) {
+    for (const r of results) {
+        const test = r.test || {};
+
+        if (test.tags?.includes("valid") && r.status !== 200) {
+            console.log("❌ Valid test failed:", test);
+        }
+
+        if (test.tags?.includes("invalid") && r.status < 400) {
+            console.log("❌ Invalid test passed:", test);
+        }
+
+        if (test.tags?.includes("xss") && typeof r.data === "string" && r.data.includes("<script>")) {
+            console.log("🚨 XSS vulnerability detected!");
+        }
+    }
+}
+module.exports = { analyze,
+        analyzeSmart
+ };

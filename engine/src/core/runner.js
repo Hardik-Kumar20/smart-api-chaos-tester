@@ -1,18 +1,34 @@
 const { sendRequest } = require("../transport/httpClient");
 const MetricsCollector = require("../metrics/collector");
-const { analyze } = require("../metrics/analyzer");
+const { analyze, analyzeSmart } = require("../metrics/analyzer");
 
 const { shouldDelay, applyLatency } = require("../chaos/latency");
 const { shouldFail } = require("../chaos/error");
 const { shouldDrop } = require("../chaos/drop");
 
 // 🔥 Base URL (change this later or pass from server)
-const BASE_URL = "https://jsonplaceholder.typicode.com";
+const BASE_URL = "http://localhost:5000";
 
 async function runTests(testCases = [], chaosConfig = {}, concurrency = 5) {
     const collector = new MetricsCollector();
 
     let index = 0;
+
+    function isTestSuccessful(test, status) {
+        if (test.tags?.includes("valid")) {
+            return status === 200;
+        }
+    
+        if (test.tags?.includes("invalid")) {
+            return status >= 400;
+        }
+    
+        if (test.tags?.includes("boundary")) {
+            return status >= 200 && status < 500;
+        }
+    
+        return false;
+    }
 
     async function worker() {
         while (index < testCases.length) {
@@ -35,7 +51,8 @@ async function runTests(testCases = [], chaosConfig = {}, concurrency = 5) {
                     status: 0,
                     latency: 0,
                     error: "Request Dropped",
-                    url: fullUrl
+                    url: fullUrl,
+                    test: test
                 });
                 continue;
             }
@@ -52,7 +69,8 @@ async function runTests(testCases = [], chaosConfig = {}, concurrency = 5) {
                     status: 500,
                     latency: 0,
                     error: "Injected Error",
-                    url: fullUrl
+                    url: fullUrl,
+                    test: test
                 });
                 continue;
             }
@@ -69,10 +87,13 @@ async function runTests(testCases = [], chaosConfig = {}, concurrency = 5) {
                     data: isGet ? undefined : (test.payload || test.body),
                     timeout: test.timeout
                 });
+                const success = isTestSuccessful(test, result.status);
 
                 collector.record({
                     ...result,
-                    url: fullUrl
+                    success,
+                    url: fullUrl,
+                    test: test
                 });
 
             } catch (err) {
@@ -81,7 +102,8 @@ async function runTests(testCases = [], chaosConfig = {}, concurrency = 5) {
                     status: 500,
                     latency: 0,
                     error: err.message,
-                    url: fullUrl
+                    url: fullUrl,
+                    test: test
                 });
             }
         }
@@ -97,6 +119,7 @@ async function runTests(testCases = [], chaosConfig = {}, concurrency = 5) {
 
     const results = collector.getResults(); // ✅ FIXED
     const summary = analyze(results);
+    analyzeSmart(results);
 
     return {
         results,

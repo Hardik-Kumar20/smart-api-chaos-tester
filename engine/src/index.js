@@ -1,12 +1,22 @@
+const fs = require("fs");
+const path = require("path");
 const { runTests } = require("./core/runner");
 
-async function main() {
-    const testCases = Array(50).fill({
-        method: "GET",
-        url: "https://jsonplaceholder.typicode.com/posts/1"
-    })
+const testPath = path.join(__dirname, "../../generator/src/output/tests.json");
+const tests = JSON.parse(fs.readFileSync(testPath, "utf-8"));
 
-    const result = await runTests(testCases, 5);
+console.log(`Loasded ${tests.length} tests`);
+
+async function main() {
+    const testCases = tests;
+
+    const chaosConfig = {
+        errorRate: 0.1
+    };
+
+    const concurrency = 5;
+
+    const result = await runTests(testCases, {}, 5);
 
     console.log("Summary:", result.summary);
 }
